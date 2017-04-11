@@ -1,0 +1,9 @@
+= Lab 1
+
+*Modify the client and server in order to:*
+
+*Server side :*
+	. Ask the server's operator to type and response for the client.
+
+*Client side:*
+	. The client send a message throw the command line to the server and waits the response.
