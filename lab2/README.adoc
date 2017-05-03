@@ -1,0 +1,13 @@
+= Exercise
+
+. Multithread Circle:
+
+.. Write a program that creates 30 threads and has a message circulate between them.
+
+.. The message is a random string with at least 80 characters
+
+.. Each time a thread receives the message it prints it, modifies the first lowercase character to uppercase, if it exists, sleeps for 1 second, and passes the message.
+
+.. When all characters are uppercase, the process passes the message and then ends.
+
+.. Before finishing, the process must print the resulting message.

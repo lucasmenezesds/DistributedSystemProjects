@@ -3,4 +3,5 @@
 == Labs practices
 
 . Lab 1
-  
+
+. Lab 2  
