@@ -1,0 +1,14 @@
+= Distributed Systems Project
+
+== First Delivery
+
+*Create a Graph and the following operations:*
+
+.CREATE
+.READ
+.UPDATE
+.DELETE
+.LIST VERTEXES OF AN EDGE > listVertexes
+.LIST EDGE OF A VERTEX > listEdges
+.LIST NEIGHBOURS VERTEXES OF A VERTEX > listNeighbourVertexes
+.Flags: 0 - From A to B, 1 = From B to A, 2 - Bidirecional
