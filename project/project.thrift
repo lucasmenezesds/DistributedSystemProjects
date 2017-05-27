@@ -54,11 +54,11 @@ service GraphOperations {
   void deleteVertex(1:i64 vertexID) throws (1: CouldNotFindObject objectNotFound, 2: OperationHasFailed opFailedMsg, 3: InvalidObject invalidObjMsg)
   
   void createEdge(1:i64 edgeID, 2:i64 vertexA, 3:i64 vertexB, 4:i64 weight, 5:i32 flag, 6:i64 description) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
-  Edge readEdge(1:i64 vertexA, 2:i64 vertexB) throws (1: CouldNotFindObject objectNotFound, 2: OperationHasFailed opFailedMsg)
+  Edge readEdge(1:i64 vertexID) throws (1: CouldNotFindObject objectNotFound, 2: OperationHasFailed opFailedMsg)
   void updateEdge(1:i64 edgeID, 2:i64 vertexA, 3:i64 vertexB, 4:double weight, 5:i32 flag, 6:i64 description) throws (1: CouldNotFindObject objectNotFound, 2: OperationHasFailed opFailedMsg, 3: InvalidObject invalidObjMsg)
   void deleteEdge(1:i64 edgeID) throws (1: CouldNotFindObject objectNotFound, 2: OperationHasFailed opFailedMsg, 3: InvalidObject invalidObjMsg)
   
-  list<Vertex> listVertexes(1: Edge edge) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
-  list<Edge> listEdges(1: Vertex vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
-  list<Vertex> listNeighbourVertexes(1: Vertex vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+  list<Vertex> listVertexes(1: i64 edge) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+  list<Edge> listEdges(1: i64 vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+  list<Vertex> listNeighbourVertexes(1: i64 vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
 }

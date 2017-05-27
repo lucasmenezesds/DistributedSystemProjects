@@ -29,12 +29,12 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  void updateVertex(i64 vertexID, i64 color, string description, double weight)')
     print('  void deleteVertex(i64 vertexID)')
     print('  void createEdge(i64 edgeID, i64 vertexA, i64 vertexB, i64 weight, i32 flag, i64 description)')
-    print('  Edge readEdge(i64 vertexA, i64 vertexB)')
-    print('  void updateEdge(i64 vertexA, i64 vertexB, double weight, i32 flag, i64 description)')
+    print('  Edge readEdge(i64 vertexID)')
+    print('  void updateEdge(i64 edgeID, i64 vertexA, i64 vertexB, double weight, i32 flag, i64 description)')
     print('  void deleteEdge(i64 edgeID)')
-    print('   listVertexes(Edge edge)')
-    print('   listEdges(Vertex vertex)')
-    print('   listNeighbourVertexes(Vertex vertex)')
+    print('   listVertexes(i64 edge)')
+    print('   listEdges(i64 vertex)')
+    print('   listNeighbourVertexes(i64 vertex)')
     print('')
     sys.exit(0)
 
@@ -145,16 +145,16 @@ elif cmd == 'createEdge':
     pp.pprint(client.createEdge(eval(args[0]), eval(args[1]), eval(args[2]), eval(args[3]), eval(args[4]), eval(args[5]),))
 
 elif cmd == 'readEdge':
-    if len(args) != 2:
-        print('readEdge requires 2 args')
+    if len(args) != 1:
+        print('readEdge requires 1 args')
         sys.exit(1)
-    pp.pprint(client.readEdge(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.readEdge(eval(args[0]),))
 
 elif cmd == 'updateEdge':
-    if len(args) != 5:
-        print('updateEdge requires 5 args')
+    if len(args) != 6:
+        print('updateEdge requires 6 args')
         sys.exit(1)
-    pp.pprint(client.updateEdge(eval(args[0]), eval(args[1]), eval(args[2]), eval(args[3]), eval(args[4]),))
+    pp.pprint(client.updateEdge(eval(args[0]), eval(args[1]), eval(args[2]), eval(args[3]), eval(args[4]), eval(args[5]),))
 
 elif cmd == 'deleteEdge':
     if len(args) != 1:

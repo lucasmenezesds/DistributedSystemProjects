@@ -62,17 +62,17 @@ class Iface(object):
         """
         pass
 
-    def readEdge(self, vertexA, vertexB):
+    def readEdge(self, vertexID):
         """
         Parameters:
-         - vertexA
-         - vertexB
+         - vertexID
         """
         pass
 
-    def updateEdge(self, vertexA, vertexB, weight, flag, description):
+    def updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
+         - edgeID
          - vertexA
          - vertexB
          - weight
@@ -310,20 +310,18 @@ class Client(Iface):
             raise result.opFailedMsg
         return
 
-    def readEdge(self, vertexA, vertexB):
+    def readEdge(self, vertexID):
         """
         Parameters:
-         - vertexA
-         - vertexB
+         - vertexID
         """
-        self.send_readEdge(vertexA, vertexB)
+        self.send_readEdge(vertexID)
         return self.recv_readEdge()
 
-    def send_readEdge(self, vertexA, vertexB):
+    def send_readEdge(self, vertexID):
         self._oprot.writeMessageBegin('readEdge', TMessageType.CALL, self._seqid)
         args = readEdge_args()
-        args.vertexA = vertexA
-        args.vertexB = vertexB
+        args.vertexID = vertexID
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -347,21 +345,23 @@ class Client(Iface):
             raise result.opFailedMsg
         raise TApplicationException(TApplicationException.MISSING_RESULT, "readEdge failed: unknown result")
 
-    def updateEdge(self, vertexA, vertexB, weight, flag, description):
+    def updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
+         - edgeID
          - vertexA
          - vertexB
          - weight
          - flag
          - description
         """
-        self.send_updateEdge(vertexA, vertexB, weight, flag, description)
+        self.send_updateEdge(edgeID, vertexA, vertexB, weight, flag, description)
         self.recv_updateEdge()
 
-    def send_updateEdge(self, vertexA, vertexB, weight, flag, description):
+    def send_updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
         self._oprot.writeMessageBegin('updateEdge', TMessageType.CALL, self._seqid)
         args = updateEdge_args()
+        args.edgeID = edgeID
         args.vertexA = vertexA
         args.vertexB = vertexB
         args.weight = weight
@@ -699,7 +699,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = readEdge_result()
         try:
-            result.success = self._handler.readEdge(args.vertexA, args.vertexB)
+            result.success = self._handler.readEdge(args.vertexID)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
@@ -724,7 +724,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = updateEdge_result()
         try:
-            self._handler.updateEdge(args.vertexA, args.vertexB, args.weight, args.flag, args.description)
+            self._handler.updateEdge(args.edgeID, args.vertexA, args.vertexB, args.weight, args.flag, args.description)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
@@ -1695,19 +1695,16 @@ class createEdge_result(object):
 class readEdge_args(object):
     """
     Attributes:
-     - vertexA
-     - vertexB
+     - vertexID
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'vertexA', None, None, ),  # 1
-        (2, TType.I64, 'vertexB', None, None, ),  # 2
+        (1, TType.I64, 'vertexID', None, None, ),  # 1
     )
 
-    def __init__(self, vertexA=None, vertexB=None,):
-        self.vertexA = vertexA
-        self.vertexB = vertexB
+    def __init__(self, vertexID=None,):
+        self.vertexID = vertexID
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -1720,12 +1717,7 @@ class readEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.vertexA = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I64:
-                    self.vertexB = iprot.readI64()
+                    self.vertexID = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -1738,13 +1730,9 @@ class readEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('readEdge_args')
-        if self.vertexA is not None:
-            oprot.writeFieldBegin('vertexA', TType.I64, 1)
-            oprot.writeI64(self.vertexA)
-            oprot.writeFieldEnd()
-        if self.vertexB is not None:
-            oprot.writeFieldBegin('vertexB', TType.I64, 2)
-            oprot.writeI64(self.vertexB)
+        if self.vertexID is not None:
+            oprot.writeFieldBegin('vertexID', TType.I64, 1)
+            oprot.writeI64(self.vertexID)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -1853,6 +1841,7 @@ class readEdge_result(object):
 class updateEdge_args(object):
     """
     Attributes:
+     - edgeID
      - vertexA
      - vertexB
      - weight
@@ -1862,14 +1851,16 @@ class updateEdge_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'vertexA', None, None, ),  # 1
-        (2, TType.I64, 'vertexB', None, None, ),  # 2
-        (3, TType.DOUBLE, 'weight', None, None, ),  # 3
-        (4, TType.I32, 'flag', None, None, ),  # 4
-        (5, TType.I64, 'description', None, None, ),  # 5
+        (1, TType.I64, 'edgeID', None, None, ),  # 1
+        (2, TType.I64, 'vertexA', None, None, ),  # 2
+        (3, TType.I64, 'vertexB', None, None, ),  # 3
+        (4, TType.DOUBLE, 'weight', None, None, ),  # 4
+        (5, TType.I32, 'flag', None, None, ),  # 5
+        (6, TType.I64, 'description', None, None, ),  # 6
     )
 
-    def __init__(self, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
+    def __init__(self, edgeID=None, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
+        self.edgeID = edgeID
         self.vertexA = vertexA
         self.vertexB = vertexB
         self.weight = weight
@@ -1887,25 +1878,30 @@ class updateEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.vertexA = iprot.readI64()
+                    self.edgeID = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.I64:
-                    self.vertexB = iprot.readI64()
+                    self.vertexA = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
+                if ftype == TType.I64:
+                    self.vertexB = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
                 if ftype == TType.DOUBLE:
                     self.weight = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
-            elif fid == 4:
+            elif fid == 5:
                 if ftype == TType.I32:
                     self.flag = iprot.readI32()
                 else:
                     iprot.skip(ftype)
-            elif fid == 5:
+            elif fid == 6:
                 if ftype == TType.I64:
                     self.description = iprot.readI64()
                 else:
@@ -1920,24 +1916,28 @@ class updateEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('updateEdge_args')
+        if self.edgeID is not None:
+            oprot.writeFieldBegin('edgeID', TType.I64, 1)
+            oprot.writeI64(self.edgeID)
+            oprot.writeFieldEnd()
         if self.vertexA is not None:
-            oprot.writeFieldBegin('vertexA', TType.I64, 1)
+            oprot.writeFieldBegin('vertexA', TType.I64, 2)
             oprot.writeI64(self.vertexA)
             oprot.writeFieldEnd()
         if self.vertexB is not None:
-            oprot.writeFieldBegin('vertexB', TType.I64, 2)
+            oprot.writeFieldBegin('vertexB', TType.I64, 3)
             oprot.writeI64(self.vertexB)
             oprot.writeFieldEnd()
         if self.weight is not None:
-            oprot.writeFieldBegin('weight', TType.DOUBLE, 3)
+            oprot.writeFieldBegin('weight', TType.DOUBLE, 4)
             oprot.writeDouble(self.weight)
             oprot.writeFieldEnd()
         if self.flag is not None:
-            oprot.writeFieldBegin('flag', TType.I32, 4)
+            oprot.writeFieldBegin('flag', TType.I32, 5)
             oprot.writeI32(self.flag)
             oprot.writeFieldEnd()
         if self.description is not None:
-            oprot.writeFieldBegin('description', TType.I64, 5)
+            oprot.writeFieldBegin('description', TType.I64, 6)
             oprot.writeI64(self.description)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2200,7 +2200,7 @@ class listVertexes_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'edge', (Edge, Edge.thrift_spec), None, ),  # 1
+        (1, TType.I64, 'edge', None, None, ),  # 1
     )
 
     def __init__(self, edge=None,):
@@ -2216,9 +2216,8 @@ class listVertexes_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.edge = Edge()
-                    self.edge.read(iprot)
+                if ftype == TType.I64:
+                    self.edge = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2232,8 +2231,8 @@ class listVertexes_args(object):
             return
         oprot.writeStructBegin('listVertexes_args')
         if self.edge is not None:
-            oprot.writeFieldBegin('edge', TType.STRUCT, 1)
-            self.edge.write(oprot)
+            oprot.writeFieldBegin('edge', TType.I64, 1)
+            oprot.writeI64(self.edge)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2355,7 +2354,7 @@ class listEdges_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'vertex', (Vertex, Vertex.thrift_spec), None, ),  # 1
+        (1, TType.I64, 'vertex', None, None, ),  # 1
     )
 
     def __init__(self, vertex=None,):
@@ -2371,9 +2370,8 @@ class listEdges_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.vertex = Vertex()
-                    self.vertex.read(iprot)
+                if ftype == TType.I64:
+                    self.vertex = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2387,8 +2385,8 @@ class listEdges_args(object):
             return
         oprot.writeStructBegin('listEdges_args')
         if self.vertex is not None:
-            oprot.writeFieldBegin('vertex', TType.STRUCT, 1)
-            self.vertex.write(oprot)
+            oprot.writeFieldBegin('vertex', TType.I64, 1)
+            oprot.writeI64(self.vertex)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2510,7 +2508,7 @@ class listNeighbourVertexes_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'vertex', (Vertex, Vertex.thrift_spec), None, ),  # 1
+        (1, TType.I64, 'vertex', None, None, ),  # 1
     )
 
     def __init__(self, vertex=None,):
@@ -2526,9 +2524,8 @@ class listNeighbourVertexes_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.vertex = Vertex()
-                    self.vertex.read(iprot)
+                if ftype == TType.I64:
+                    self.vertex = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2542,8 +2539,8 @@ class listNeighbourVertexes_args(object):
             return
         oprot.writeStructBegin('listNeighbourVertexes_args')
         if self.vertex is not None:
-            oprot.writeFieldBegin('vertex', TType.STRUCT, 1)
-            self.vertex.write(oprot)
+            oprot.writeFieldBegin('vertex', TType.I64, 1)
+            oprot.writeI64(self.vertex)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()

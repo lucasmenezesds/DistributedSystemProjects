@@ -46,12 +46,6 @@ class Handler(object):
 	def remove_edge(self, edge):
 		self.__edges_list.remove(edge)
 
-
-	def check_valid_data(self, data_array):
-		for elem in data_array:
-			if (elem == "" or elem == None):
-				sys.exit("Some value of edge or vertex is invalid, check the files please!")
-
 	def get_vertexes_list(self):
 		return self.__vertexes_list
 
@@ -68,43 +62,9 @@ class Handler(object):
 			self.__edges_list = []
 
 
-	def update_vertexes_list_of_edges(self, vertex=False):
-		if(vertex == False):
-			for vertex  in self.get_vertexes_list():
-				for edge in self.get_edges_list():
-					if (vertex.vertexID == edge.vertexA or vertex.vertexID == edge.vertexB):
-						vertex.edges.append(edge)
-		else:
-			for edge in self.get_edges_list():
-				if (vertex.vertexID == edge.vertexA or vertex.vertexID == edge.vertexB):
-					vertex.edges.append(edge)
-
-	def set_string(self, array_of_values):
-		string = ','.join([str(value) for value in array_of_values])
-		final_string = string+"\n"
-
-		return final_string
-
-
-	def formated_vertexes_list(self):
-		string = ""
-		for vertex in get_vertexes_list():
-			vertex_array = [vertex.vertexID, vertex.color, vertex.description, vertex.weight]
-			sub_string = self.set_string(vertex_array)
-			string = string +sub_string
-		return string
-
-	def formated_edges_list(self):
-		string = ""
-		for edge in get_edges_list():
-			edge_array = [edge.edgeID, edge.vertexA, edge.vertexB, edge.weight, edge.flag, edge.description]
-			sub_string = self.set_string(edge_array)
-			string = string +sub_string
-		return string
-
 	def create_graph(self, graph_id=1, vextexes_file_path="../outputs/vertexes", edges_file_path="../outputs/edges"):
 		self.get_file_for_use()
-
+		self.clean_list("both")
 		vertexes_file = open(vextexes_file_path,'r')
 		vertexes_lines = vertexes_file.read().splitlines()
 
@@ -136,17 +96,51 @@ class Handler(object):
 				self.append_edge(edge)
 			else:
 				sys.exit("Some edge data is missing! Check the file please!")
-		self.update_vertexes_list_of_edges()
 
+		# print(self.get_vertexes_list())
 		# print(self.get_vertexes_list()[0])
-		
+		# print("--------------")
+		self.update_vertexes_list_of_edges()
+		# print(self.get_vertexes_list()[0].edges)
+		# print("--------------")
 		self.free_file_for_use()
  
 		graph = Graph(graph_id, self.get_vertexes_list, self.get_edges_list)
 		return graph
 
 
-	def get_vertex(self, vertex_id):
+	#################
+	# OTHER METHODS #
+	#################
+	
+	def check_valid_data(self, data_array):
+		for elem in data_array:
+			if (elem == "" or elem == None):
+				sys.exit("Some value of edge or vertex is invalid, check the files please!")
+
+
+	def update_vertexes_list_of_edges(self, recieved_vertex=False):
+		if(recieved_vertex == False):
+			for vertex  in self.get_vertexes_list():
+				for edge in self.get_edges_list():
+					if(not self.check_vertex_edges(vertex, edge.edgeID)):
+						if ((vertex.vertexID == edge.vertexA or vertex.vertexID == edge.vertexB)):
+							if(not self.check_vertex_edges(vertex, edge)):
+								vertex.edges.append(edge)
+		else:
+			for edge in self.get_edges_list():
+				if (vertex.vertexID == edge.vertexA or vertex.vertexID == edge.vertexB):
+					vertex.edges.append(edge)
+
+
+	def check_vertex_edges(self, vertex, edge_recieved):
+		for edge in vertex.edges:
+			if(edge.edgeID == edge_recieved):
+				return True
+			else:
+				return False
+
+	def search_vertex(self, vertex_id):
 		self.create_graph()
 		vertex_return = None
 		for vertex in self.get_vertexes_list():
@@ -155,7 +149,7 @@ class Handler(object):
 		return vertex_return
 
 
-	def get_edge(self, edge_id):
+	def search_edge(self, edge_id):
 		self.create_graph()
 		edge_return = None
 		for edge in self.get_edges_list():
@@ -163,12 +157,14 @@ class Handler(object):
 				edge_return = edge
 		return edge_return
 
+
 	def insert_vertex(self, data_array, vertexes_path="../outputs/vertexes"):
 		self.get_file_for_use()
 		normalized_string = self.set_string(data_array)
 		with open(vertexes_path, "a") as file:
 			file.write(normalized_string)
 		self.free_file_for_use()
+
 
 	def insert_edge(self, data_array, edges_path="../outputs/edges"):
 		self.get_file_for_use()
@@ -178,9 +174,38 @@ class Handler(object):
 		self.free_file_for_use()
 
 
+
+	def set_string(self, array_of_values):
+		string = ','.join([str(value) for value in array_of_values])
+		final_string = string+"\n"
+
+		return final_string
+
+	def formated_vertexes_list(self):
+		string = ""
+		for vertex in get_vertexes_list():
+			vertex_array = [vertex.vertexID, vertex.color, vertex.description, vertex.weight]
+			sub_string = self.set_string(vertex_array)
+			string = string +sub_string
+		return string
+
+	def formated_edges_list(self):
+		string = ""
+		for edge in get_edges_list():
+			edge_array = [edge.edgeID, edge.vertexA, edge.vertexB, edge.weight, edge.flag, edge.description]
+			sub_string = self.set_string(edge_array)
+			string = string +sub_string
+		return string
+
+
+	###############
+	# VERTEX CRUD #
+	###############
+
+
 	def createVertex(self, vertexID, color, description, weight):
 		self.create_graph()
-		if (self.get_vertex(vertexID)):
+		if (self.search_vertex(vertexID)):
 			sys.exit("Vertex already exist!")
 		data_array = [vertexID, color, description, weight]
 		self.insert_vertex(data_array)
@@ -198,7 +223,7 @@ class Handler(object):
 	def updateVertex(self, vertexID, color=None, description=None, weight=None):
 		self.clean_list("vertex")
 		self.create_graph()
-		vertex = self.get_vertex(vertexID)
+		vertex = self.search_vertex(vertexID)
 		if( vertex == None):
 			sys.exit("Vertex do not exist!")
 
@@ -211,7 +236,7 @@ class Handler(object):
 	def deleteVertex(self, vertexID):
 		self.clean_list("both")
 		self.create_graph()
-		vertex = self.get_vertex(vertexID)
+		vertex = self.search_vertex(vertexID)
 		if( vertex == None):
 			sys.exit("Vertex do not exist!")
 		for vertex in self.get_vertexes_list():
@@ -228,15 +253,19 @@ class Handler(object):
 		self.free_file_for_use()
 
 
+	#############
+	# EDGE CRUD #
+	#############
+
 	def createEdge(self, edgeID, vertexA=None, vertexB=None, weight=None, flag=2, description=None):
 		self.create_graph()
-		if (self.get_edge(edgeID) == None):
+		if (self.search_edge(edgeID) == None):
 			sys.exit("Edge already exist!")
 		data_array = [edgeID, vertexA, vertexB, weight, flag, description]
 		self.insert_edge(data_array)
 
 
-	def readEdge(self, vertexA, vertexB):
+	def readEdge(self, edgeID):
 		self.create_graph()
 		selected_edge = None
 		for edge in self.get_edges_list():
@@ -248,7 +277,7 @@ class Handler(object):
 	def updateEdge(self, edgeID, vertexA=None, vertexB=None, weight=None, flag=None, description=None):
 		self.clean_list("edge")
 		self.create_graph()
-		edge = self.get_edge(edgeID)
+		edge = self.search_edge(edgeID)
 		if( edge == None):
 			sys.exit("Edge do not exist!")
 
@@ -262,7 +291,7 @@ class Handler(object):
 	def deleteEdge(self, edgeID):
 		self.clean_list("both")
 		self.create_graph()
-		edge = self.get_edge(edgeID,vertexA,vertexB,weight,flag,description)
+		edge = self.search_edge(edgeID, vertexA, vertexB, weight, flag, description)
 		if( edge == None):
 			sys.exit("Edge do not exist!")
 		for edge in self.get_edges_list():
@@ -277,18 +306,43 @@ class Handler(object):
 		self.free_file_for_use()
 
 
-	def listVertexes():
-		self.create_graph()
-		pass
 
-	def listEdges():
-		self.create_graph()
-		pass
+	#######################
+	# listing Operations #
+	#######################
 
-	def listNeighbourVertexes():
-		self.create_graph()
-		pass
 
+	def listVertexes(self, edgeID):
+		self.create_graph()
+		vertexes_list = []
+		for edge in self.get_edges_list():
+			if (edge.edgeID == edgeID):
+				vertexes_list.append(edge) # edge.vertexA
+				vertexes_list.append(edge) # edge.vertexB
+		return vertexes_list
+
+
+	def listEdges(self, vertexID):
+		self.create_graph()
+		vertex = self.search_vertex(vertexID)
+		if (vertex == None):
+			sys.exit("Vertex do not exist!")
+		return vertex.edges
+
+
+	def listNeighbourVertexes(self, vertexID):
+		self.create_graph()
+		neighbour_vertexes_list = []
+		if(self.search_vertex(vertexID) == None):
+			sys.exit("Vertex do not exist!")
+
+		for edge in self.get_edges_list():
+			if(edge.vertexA == vertexID):
+				neighbour_vertexes_list.append(edge) # edge.edgeID
+			elif(edge.vertexB == vertexID):
+				neighbour_vertexes_list.append(edge) # edge.edgeID
+
+		return neighbour_vertexes_list
 
 
 vertexes_path = "../outputs/vertexes"
@@ -297,8 +351,12 @@ port = 3030
 
 
 handler_object = Handler()
+
 # handler_object.create_graph(1, vertexes_path, edges_path)
-# print (handler_object.get_vertexes_list())
+# x = handler_object.listVertexes(1)
+# x = handler_object.listNeighbourVertexes(1)
+# print(x)
+# print (handler_object.listEdges(1))
 
 
 

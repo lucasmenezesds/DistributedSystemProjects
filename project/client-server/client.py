@@ -3,9 +3,9 @@
 # https://thrift.apache.org/tutorial/py
 
 import sys
-sys.path.append('gen-py')
+sys.path.append("../gen-py/")
 
-from graphProject import *
+from graphProject import GraphOperations
 from graphProject.ttypes import *
 
 from thrift import Thrift
@@ -16,34 +16,30 @@ from thrift.protocol import TBinaryProtocol
 
 vertex = 1
 
-try:
-	# Make socket
-	transport = TSocket.TSocket('localhost', 3030)
+# Make socket
+transport = TSocket.TSocket('localhost', 3030)
 
-	# Buffering is critical. Raw sockets are very slow
-	transport = TTransport.TBufferedTransport(transport)
+# Buffering is critical. Raw sockets are very slow
+transport = TTransport.TBufferedTransport(transport)
 
-	# Wrap in a protocol
-	protocol = TBinaryProtocol.TBinaryProtocol(transport)
+# Wrap in a protocol
+protocol = TBinaryProtocol.TBinaryProtocol(transport)
 
-	# Create a client to use the protocol encoder
-	client = GraphOperations.Client(protocol)
+# Create a client to use the protocol encoder
+client = GraphOperations.Client(protocol)
 
-	# Connect!
-	print("Connecting..\n")
-	transport.open()
-	print("Connected!\n")
-	client.ping()
-	print('ping()')
+# Connect!
+print("Connecting..\n")
+transport.open()
+print("Connected!\n")
+# client.ping()
+# print('ping()')
 
 
-	# Operation
-	print("Listing Neighbours Vertexes from vertex %s"%(vertex))
-	print(client.listNeighbourVertexes(vertex))
-	print("\n\n")
-
-except Thrift.CouldNotFindObject, ex:
-	print("%s" %(ex.msg))
+# Operation
+print("Listing Neighbours Vertexes from vertex %s"%(vertex))
+print(client.listNeighbourVertexes(vertex))
+print("\n\n")
 
 
 

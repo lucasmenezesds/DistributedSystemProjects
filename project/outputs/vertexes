@@ -1,5 +1,5 @@
 vertexID,color,description,weight
-1,10,1,1
-2,2,2,2
-3,3,3,3
-9,10,1,1
+1,10,Tst1,1
+2,2,Tst2,2
+3,3,Tst3,3
+9,10,Tst4,1
