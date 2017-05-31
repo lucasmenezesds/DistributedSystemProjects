@@ -15,6 +15,7 @@ from thrift.protocol import TBinaryProtocol
 
 
 vertex = 1
+vertex2 = 2
 
 # Make socket
 transport = TSocket.TSocket('localhost', 3030)
@@ -37,10 +38,14 @@ print("Connected!\n")
 
 
 # Operation
-print("Listing Neighbours Vertexes from vertex %s"%(vertex))
+print("Listing Neighbours Vertexes from vertex %s" % (vertex))
 print(client.listNeighbourVertexes(vertex))
+print("Creating Vertex!\n")
+client.createVertex(98, 5, "vert5", 3.5)
+print("Just created the Vertex!\n")
+print("Listing Vertex %s" % (vertex2))
+print(client.listEdges(vertex2))
 print("\n\n")
-
 
 
 # Close!

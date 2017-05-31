@@ -15,6 +15,12 @@ from thrift.server import TServer
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
+import time
+
+def sleep(val):
+	print("Before Sleep!")
+	time.sleep(val)
+	print("After Sleep!")
 
 
 class Handler(object):
@@ -79,7 +85,7 @@ class Handler(object):
 				vertex = Vertex(int(vertex_data[0]), int(vertex_data[1]), str(vertex_data[2]), float(vertex_data[3]), [])
 				self.append_vertex(vertex)
 			else:
-				sys.exit("Some vertex data is missing! Check the file please!")
+				raise(InvalidObject("Some vertex data is missing! Check the file please!"))
 
 		edges_file = open(edges_file_path,'r')
 		edges_lines = edges_file.read().splitlines()
@@ -95,7 +101,7 @@ class Handler(object):
 				edge = Edge(int(edge_data[0]), int(edge_data[1]), int(edge_data[2]), float(edge_data[3]), int(edge_data[4]), str(edge_data[5]))
 				self.append_edge(edge)
 			else:
-				sys.exit("Some edge data is missing! Check the file please!")
+				raise(InvalidObject("Some edge data is missing! Check the file please!"))
 
 		# print(self.get_vertexes_list())
 		# print(self.get_vertexes_list()[0])
@@ -116,7 +122,7 @@ class Handler(object):
 	def check_valid_data(self, data_array):
 		for elem in data_array:
 			if (elem == "" or elem == None):
-				sys.exit("Some value of edge or vertex is invalid, check the files please!")
+				raise(InvalidObject("Some value of edge or vertex is invalid, check the files please!"))
 
 
 	def update_vertexes_list_of_edges(self, recieved_vertex=False):
@@ -160,6 +166,7 @@ class Handler(object):
 
 	def insert_vertex(self, data_array, vertexes_path="../outputs/vertexes"):
 		self.get_file_for_use()
+		sleep(30)
 		normalized_string = self.set_string(data_array)
 		with open(vertexes_path, "a") as file:
 			file.write(normalized_string)
@@ -168,6 +175,7 @@ class Handler(object):
 
 	def insert_edge(self, data_array, edges_path="../outputs/edges"):
 		self.get_file_for_use()
+		sleep(30)
 		normalized_string = self.set_string(data_array)
 		with open(edges_path, "a") as file:
 			file.write(normalized_string)
@@ -206,7 +214,8 @@ class Handler(object):
 	def createVertex(self, vertexID, color, description, weight):
 		self.create_graph()
 		if (self.search_vertex(vertexID)):
-			sys.exit("Vertex already exist!")
+			raise(InvalidObject("Vertex already exist!"))
+
 		data_array = [vertexID, color, description, weight]
 		self.insert_vertex(data_array)
 
@@ -225,7 +234,7 @@ class Handler(object):
 		self.create_graph()
 		vertex = self.search_vertex(vertexID)
 		if( vertex == None):
-			sys.exit("Vertex do not exist!")
+			raise(InvalidObject("Vertex do not exist!"))
 
 		vertex.color = color
 		vertex.description = description 
@@ -238,7 +247,7 @@ class Handler(object):
 		self.create_graph()
 		vertex = self.search_vertex(vertexID)
 		if( vertex == None):
-			sys.exit("Vertex do not exist!")
+			raise(InvalidObject("Vertex do not exist!"))
 		for vertex in self.get_vertexes_list():
 			if (vertex.vertexID == vertexID):
 				for edge in vertex.edges:
@@ -260,7 +269,7 @@ class Handler(object):
 	def createEdge(self, edgeID, vertexA=None, vertexB=None, weight=None, flag=2, description=None):
 		self.create_graph()
 		if (self.search_edge(edgeID) == None):
-			sys.exit("Edge already exist!")
+			raise(InvalidObject("Edge already exist!"))
 		data_array = [edgeID, vertexA, vertexB, weight, flag, description]
 		self.insert_edge(data_array)
 
@@ -279,7 +288,7 @@ class Handler(object):
 		self.create_graph()
 		edge = self.search_edge(edgeID)
 		if( edge == None):
-			sys.exit("Edge do not exist!")
+			raise(InvalidObject("Edge do not exist!"))
 
 		edge.vertexA = vertexA 
 		edge.vertexB = vertexB 
@@ -293,7 +302,7 @@ class Handler(object):
 		self.create_graph()
 		edge = self.search_edge(edgeID, vertexA, vertexB, weight, flag, description)
 		if( edge == None):
-			sys.exit("Edge do not exist!")
+			raise(InvalidObject("Edge do not exist!"))
 		for edge in self.get_edges_list():
 			if (edge.edgeID == edgeID):
 				self.remove_edge(edge)
@@ -326,7 +335,7 @@ class Handler(object):
 		self.create_graph()
 		vertex = self.search_vertex(vertexID)
 		if (vertex == None):
-			sys.exit("Vertex do not exist!")
+			raise(InvalidObject("Vertex do not exist!"))
 		return vertex.edges
 
 
@@ -334,7 +343,7 @@ class Handler(object):
 		self.create_graph()
 		neighbour_vertexes_list = []
 		if(self.search_vertex(vertexID) == None):
-			sys.exit("Vertex do not exist!")
+			raise(InvalidObject("Vertex do not exist!"))
 
 		for edge in self.get_edges_list():
 			if(edge.vertexA == vertexID):
