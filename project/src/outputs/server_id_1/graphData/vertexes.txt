@@ -1,0 +1,4 @@
+vertexID,color,description,weight
+3,3,Tst3,3.0
+9,10,Tst4,1.0
+6,5,vert5,3.5
