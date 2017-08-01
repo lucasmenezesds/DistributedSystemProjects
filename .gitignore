@@ -4,3 +4,5 @@ lab2/deprecated/
 project/tests/
 
 *.pyc
+
+project/\.idea/
