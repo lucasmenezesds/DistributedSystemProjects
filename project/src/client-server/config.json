@@ -1,0 +1,7 @@
+{
+
+  "thrift_server_port" : 3030,
+  "raft_server_port" : 4000,
+  "number_of_servers": 3
+  
+}

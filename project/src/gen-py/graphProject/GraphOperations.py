@@ -19,9 +19,6 @@ class Iface(object):
     def ping(self):
         pass
 
-    def createGraph(self):
-        pass
-
     def createVertex(self, vertexID, color, description, weight):
         """
         Parameters:
@@ -56,10 +53,9 @@ class Iface(object):
         """
         pass
 
-    def createEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def createEdge(self, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
-         - edgeID
          - vertexA
          - vertexB
          - weight
@@ -68,17 +64,17 @@ class Iface(object):
         """
         pass
 
-    def readEdge(self, vertexID):
+    def readEdge(self, vertexA, vertexB):
         """
         Parameters:
-         - vertexID
+         - vertexA
+         - vertexB
         """
         pass
 
-    def updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def updateEdge(self, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
-         - edgeID
          - vertexA
          - vertexB
          - weight
@@ -87,17 +83,11 @@ class Iface(object):
         """
         pass
 
-    def deleteEdge(self, edgeID):
+    def deleteEdge(self, vertexA, vertexB):
         """
         Parameters:
-         - edgeID
-        """
-        pass
-
-    def listVertexes(self, edge):
-        """
-        Parameters:
-         - edge
+         - vertexA
+         - vertexB
         """
         pass
 
@@ -113,34 +103,6 @@ class Iface(object):
         Parameters:
          - vertex
         """
-        pass
-
-    def createVertexFile(self, dataToSave, serverId):
-        """
-        Parameters:
-         - dataToSave
-         - serverId
-        """
-        pass
-
-    def createEdgeFile(self, dataToSave, serverId):
-        """
-        Parameters:
-         - dataToSave
-         - serverId
-        """
-        pass
-
-    def getLocalVertexes(self):
-        pass
-
-    def getLocalEdges(self):
-        pass
-
-    def parseDataFromAllServers(self):
-        pass
-
-    def saveGraphOnServers(self):
         pass
 
     def calculateDijkstra(self, vertexA, vertexB):
@@ -181,34 +143,6 @@ class Client(Iface):
         result = ping_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        return
-
-    def createGraph(self):
-        self.send_createGraph()
-        self.recv_createGraph()
-
-    def send_createGraph(self):
-        self._oprot.writeMessageBegin('createGraph', TMessageType.CALL, self._seqid)
-        args = createGraph_args()
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_createGraph(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = createGraph_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
         return
 
     def createVertex(self, vertexID, color, description, weight):
@@ -279,8 +213,6 @@ class Client(Iface):
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
-        if result.wrongServer is not None:
-            raise result.wrongServer
         if result.opFailedMsg is not None:
             raise result.opFailedMsg
         raise TApplicationException(TApplicationException.MISSING_RESULT, "readVertex failed: unknown result")
@@ -318,8 +250,6 @@ class Client(Iface):
         result = updateVertex_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        if result.wrongServer is not None:
-            raise result.wrongServer
         if result.opFailedMsg is not None:
             raise result.opFailedMsg
         if result.invalidObjMsg is not None:
@@ -353,31 +283,25 @@ class Client(Iface):
         result = deleteVertex_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        if result.wrongServer is not None:
-            raise result.wrongServer
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
         if result.invalidObjMsg is not None:
             raise result.invalidObjMsg
         return
 
-    def createEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def createEdge(self, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
-         - edgeID
          - vertexA
          - vertexB
          - weight
          - flag
          - description
         """
-        self.send_createEdge(edgeID, vertexA, vertexB, weight, flag, description)
+        self.send_createEdge(vertexA, vertexB, weight, flag, description)
         self.recv_createEdge()
 
-    def send_createEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def send_createEdge(self, vertexA, vertexB, weight, flag, description):
         self._oprot.writeMessageBegin('createEdge', TMessageType.CALL, self._seqid)
         args = createEdge_args()
-        args.edgeID = edgeID
         args.vertexA = vertexA
         args.vertexB = vertexB
         args.weight = weight
@@ -404,18 +328,20 @@ class Client(Iface):
             raise result.opFailedMsg
         return
 
-    def readEdge(self, vertexID):
+    def readEdge(self, vertexA, vertexB):
         """
         Parameters:
-         - vertexID
+         - vertexA
+         - vertexB
         """
-        self.send_readEdge(vertexID)
+        self.send_readEdge(vertexA, vertexB)
         return self.recv_readEdge()
 
-    def send_readEdge(self, vertexID):
+    def send_readEdge(self, vertexA, vertexB):
         self._oprot.writeMessageBegin('readEdge', TMessageType.CALL, self._seqid)
         args = readEdge_args()
-        args.vertexID = vertexID
+        args.vertexA = vertexA
+        args.vertexB = vertexB
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -433,29 +359,25 @@ class Client(Iface):
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
-        if result.wrongServer is not None:
-            raise result.wrongServer
         if result.opFailedMsg is not None:
             raise result.opFailedMsg
         raise TApplicationException(TApplicationException.MISSING_RESULT, "readEdge failed: unknown result")
 
-    def updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def updateEdge(self, vertexA, vertexB, weight, flag, description):
         """
         Parameters:
-         - edgeID
          - vertexA
          - vertexB
          - weight
          - flag
          - description
         """
-        self.send_updateEdge(edgeID, vertexA, vertexB, weight, flag, description)
+        self.send_updateEdge(vertexA, vertexB, weight, flag, description)
         self.recv_updateEdge()
 
-    def send_updateEdge(self, edgeID, vertexA, vertexB, weight, flag, description):
+    def send_updateEdge(self, vertexA, vertexB, weight, flag, description):
         self._oprot.writeMessageBegin('updateEdge', TMessageType.CALL, self._seqid)
         args = updateEdge_args()
-        args.edgeID = edgeID
         args.vertexA = vertexA
         args.vertexB = vertexB
         args.weight = weight
@@ -476,26 +398,26 @@ class Client(Iface):
         result = updateEdge_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        if result.wrongServer is not None:
-            raise result.wrongServer
         if result.opFailedMsg is not None:
             raise result.opFailedMsg
         if result.invalidObjMsg is not None:
             raise result.invalidObjMsg
         return
 
-    def deleteEdge(self, edgeID):
+    def deleteEdge(self, vertexA, vertexB):
         """
         Parameters:
-         - edgeID
+         - vertexA
+         - vertexB
         """
-        self.send_deleteEdge(edgeID)
+        self.send_deleteEdge(vertexA, vertexB)
         self.recv_deleteEdge()
 
-    def send_deleteEdge(self, edgeID):
+    def send_deleteEdge(self, vertexA, vertexB):
         self._oprot.writeMessageBegin('deleteEdge', TMessageType.CALL, self._seqid)
         args = deleteEdge_args()
-        args.edgeID = edgeID
+        args.vertexA = vertexA
+        args.vertexB = vertexB
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -511,48 +433,11 @@ class Client(Iface):
         result = deleteEdge_result()
         result.read(iprot)
         iprot.readMessageEnd()
-        if result.wrongServer is not None:
-            raise result.wrongServer
         if result.opFailedMsg is not None:
             raise result.opFailedMsg
         if result.invalidObjMsg is not None:
             raise result.invalidObjMsg
         return
-
-    def listVertexes(self, edge):
-        """
-        Parameters:
-         - edge
-        """
-        self.send_listVertexes(edge)
-        return self.recv_listVertexes()
-
-    def send_listVertexes(self, edge):
-        self._oprot.writeMessageBegin('listVertexes', TMessageType.CALL, self._seqid)
-        args = listVertexes_args()
-        args.edge = edge
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_listVertexes(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = listVertexes_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.success is not None:
-            return result.success
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "listVertexes failed: unknown result")
 
     def listEdges(self, vertex):
         """
@@ -624,184 +509,6 @@ class Client(Iface):
             raise result.opFailedMsg
         raise TApplicationException(TApplicationException.MISSING_RESULT, "listNeighbourVertexes failed: unknown result")
 
-    def createVertexFile(self, dataToSave, serverId):
-        """
-        Parameters:
-         - dataToSave
-         - serverId
-        """
-        self.send_createVertexFile(dataToSave, serverId)
-        self.recv_createVertexFile()
-
-    def send_createVertexFile(self, dataToSave, serverId):
-        self._oprot.writeMessageBegin('createVertexFile', TMessageType.CALL, self._seqid)
-        args = createVertexFile_args()
-        args.dataToSave = dataToSave
-        args.serverId = serverId
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_createVertexFile(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = createVertexFile_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
-        return
-
-    def createEdgeFile(self, dataToSave, serverId):
-        """
-        Parameters:
-         - dataToSave
-         - serverId
-        """
-        self.send_createEdgeFile(dataToSave, serverId)
-        self.recv_createEdgeFile()
-
-    def send_createEdgeFile(self, dataToSave, serverId):
-        self._oprot.writeMessageBegin('createEdgeFile', TMessageType.CALL, self._seqid)
-        args = createEdgeFile_args()
-        args.dataToSave = dataToSave
-        args.serverId = serverId
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_createEdgeFile(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = createEdgeFile_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
-        return
-
-    def getLocalVertexes(self):
-        self.send_getLocalVertexes()
-        return self.recv_getLocalVertexes()
-
-    def send_getLocalVertexes(self):
-        self._oprot.writeMessageBegin('getLocalVertexes', TMessageType.CALL, self._seqid)
-        args = getLocalVertexes_args()
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_getLocalVertexes(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = getLocalVertexes_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.success is not None:
-            return result.success
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "getLocalVertexes failed: unknown result")
-
-    def getLocalEdges(self):
-        self.send_getLocalEdges()
-        return self.recv_getLocalEdges()
-
-    def send_getLocalEdges(self):
-        self._oprot.writeMessageBegin('getLocalEdges', TMessageType.CALL, self._seqid)
-        args = getLocalEdges_args()
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_getLocalEdges(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = getLocalEdges_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.success is not None:
-            return result.success
-        if result.invalidObjMsg is not None:
-            raise result.invalidObjMsg
-        if result.opFailedMsg is not None:
-            raise result.opFailedMsg
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "getLocalEdges failed: unknown result")
-
-    def parseDataFromAllServers(self):
-        self.send_parseDataFromAllServers()
-        self.recv_parseDataFromAllServers()
-
-    def send_parseDataFromAllServers(self):
-        self._oprot.writeMessageBegin('parseDataFromAllServers', TMessageType.CALL, self._seqid)
-        args = parseDataFromAllServers_args()
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_parseDataFromAllServers(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = parseDataFromAllServers_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        return
-
-    def saveGraphOnServers(self):
-        self.send_saveGraphOnServers()
-        self.recv_saveGraphOnServers()
-
-    def send_saveGraphOnServers(self):
-        self._oprot.writeMessageBegin('saveGraphOnServers', TMessageType.CALL, self._seqid)
-        args = saveGraphOnServers_args()
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_saveGraphOnServers(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = saveGraphOnServers_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        return
-
     def calculateDijkstra(self, vertexA, vertexB):
         """
         Parameters:
@@ -843,7 +550,6 @@ class Processor(Iface, TProcessor):
         self._handler = handler
         self._processMap = {}
         self._processMap["ping"] = Processor.process_ping
-        self._processMap["createGraph"] = Processor.process_createGraph
         self._processMap["createVertex"] = Processor.process_createVertex
         self._processMap["readVertex"] = Processor.process_readVertex
         self._processMap["updateVertex"] = Processor.process_updateVertex
@@ -852,15 +558,8 @@ class Processor(Iface, TProcessor):
         self._processMap["readEdge"] = Processor.process_readEdge
         self._processMap["updateEdge"] = Processor.process_updateEdge
         self._processMap["deleteEdge"] = Processor.process_deleteEdge
-        self._processMap["listVertexes"] = Processor.process_listVertexes
         self._processMap["listEdges"] = Processor.process_listEdges
         self._processMap["listNeighbourVertexes"] = Processor.process_listNeighbourVertexes
-        self._processMap["createVertexFile"] = Processor.process_createVertexFile
-        self._processMap["createEdgeFile"] = Processor.process_createEdgeFile
-        self._processMap["getLocalVertexes"] = Processor.process_getLocalVertexes
-        self._processMap["getLocalEdges"] = Processor.process_getLocalEdges
-        self._processMap["parseDataFromAllServers"] = Processor.process_parseDataFromAllServers
-        self._processMap["saveGraphOnServers"] = Processor.process_saveGraphOnServers
         self._processMap["calculateDijkstra"] = Processor.process_calculateDijkstra
 
     def process(self, iprot, oprot):
@@ -893,31 +592,6 @@ class Processor(Iface, TProcessor):
             logging.exception(ex)
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("ping", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_createGraph(self, seqid, iprot, oprot):
-        args = createGraph_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = createGraph_result()
-        try:
-            self._handler.createGraph()
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("createGraph", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -957,9 +631,6 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
         except OperationHasFailed as opFailedMsg:
             msg_type = TMessageType.REPLY
             result.opFailedMsg = opFailedMsg
@@ -982,9 +653,6 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
         except OperationHasFailed as opFailedMsg:
             msg_type = TMessageType.REPLY
             result.opFailedMsg = opFailedMsg
@@ -1010,12 +678,6 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
         except InvalidObject as invalidObjMsg:
             msg_type = TMessageType.REPLY
             result.invalidObjMsg = invalidObjMsg
@@ -1034,7 +696,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = createEdge_result()
         try:
-            self._handler.createEdge(args.edgeID, args.vertexA, args.vertexB, args.weight, args.flag, args.description)
+            self._handler.createEdge(args.vertexA, args.vertexB, args.weight, args.flag, args.description)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
@@ -1059,13 +721,10 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = readEdge_result()
         try:
-            result.success = self._handler.readEdge(args.vertexID)
+            result.success = self._handler.readEdge(args.vertexA, args.vertexB)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
         except OperationHasFailed as opFailedMsg:
             msg_type = TMessageType.REPLY
             result.opFailedMsg = opFailedMsg
@@ -1084,13 +743,10 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = updateEdge_result()
         try:
-            self._handler.updateEdge(args.edgeID, args.vertexA, args.vertexB, args.weight, args.flag, args.description)
+            self._handler.updateEdge(args.vertexA, args.vertexB, args.weight, args.flag, args.description)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
         except OperationHasFailed as opFailedMsg:
             msg_type = TMessageType.REPLY
             result.opFailedMsg = opFailedMsg
@@ -1112,13 +768,10 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = deleteEdge_result()
         try:
-            self._handler.deleteEdge(args.edgeID)
+            self._handler.deleteEdge(args.vertexA, args.vertexB)
             msg_type = TMessageType.REPLY
         except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
             raise
-        except WrongServer as wrongServer:
-            msg_type = TMessageType.REPLY
-            result.wrongServer = wrongServer
         except OperationHasFailed as opFailedMsg:
             msg_type = TMessageType.REPLY
             result.opFailedMsg = opFailedMsg
@@ -1130,31 +783,6 @@ class Processor(Iface, TProcessor):
             logging.exception(ex)
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("deleteEdge", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_listVertexes(self, seqid, iprot, oprot):
-        args = listVertexes_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = listVertexes_result()
-        try:
-            result.success = self._handler.listVertexes(args.edge)
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("listVertexes", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -1205,144 +833,6 @@ class Processor(Iface, TProcessor):
             logging.exception(ex)
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("listNeighbourVertexes", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_createVertexFile(self, seqid, iprot, oprot):
-        args = createVertexFile_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = createVertexFile_result()
-        try:
-            self._handler.createVertexFile(args.dataToSave, args.serverId)
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("createVertexFile", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_createEdgeFile(self, seqid, iprot, oprot):
-        args = createEdgeFile_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = createEdgeFile_result()
-        try:
-            self._handler.createEdgeFile(args.dataToSave, args.serverId)
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("createEdgeFile", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_getLocalVertexes(self, seqid, iprot, oprot):
-        args = getLocalVertexes_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = getLocalVertexes_result()
-        try:
-            result.success = self._handler.getLocalVertexes()
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("getLocalVertexes", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_getLocalEdges(self, seqid, iprot, oprot):
-        args = getLocalEdges_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = getLocalEdges_result()
-        try:
-            result.success = self._handler.getLocalEdges()
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except InvalidObject as invalidObjMsg:
-            msg_type = TMessageType.REPLY
-            result.invalidObjMsg = invalidObjMsg
-        except OperationHasFailed as opFailedMsg:
-            msg_type = TMessageType.REPLY
-            result.opFailedMsg = opFailedMsg
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("getLocalEdges", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_parseDataFromAllServers(self, seqid, iprot, oprot):
-        args = parseDataFromAllServers_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = parseDataFromAllServers_result()
-        try:
-            self._handler.parseDataFromAllServers()
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("parseDataFromAllServers", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_saveGraphOnServers(self, seqid, iprot, oprot):
-        args = saveGraphOnServers_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = saveGraphOnServers_result()
-        try:
-            self._handler.saveGraphOnServers()
-            msg_type = TMessageType.REPLY
-        except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
-            raise
-        except Exception as ex:
-            msg_type = TMessageType.EXCEPTION
-            logging.exception(ex)
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("saveGraphOnServers", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -1441,122 +931,6 @@ class ping_result(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('ping_result')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createGraph_args(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createGraph_args')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createGraph_result(object):
-    """
-    Attributes:
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, invalidObjMsg=None, opFailedMsg=None,):
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createGraph_result')
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -1809,19 +1183,16 @@ class readVertex_result(object):
     """
     Attributes:
      - success
-     - wrongServer
      - opFailedMsg
     """
 
     thrift_spec = (
         (0, TType.STRUCT, 'success', (Vertex, Vertex.thrift_spec), None, ),  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
+        (1, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 1
     )
 
-    def __init__(self, success=None, wrongServer=None, opFailedMsg=None,):
+    def __init__(self, success=None, opFailedMsg=None,):
         self.success = success
-        self.wrongServer = wrongServer
         self.opFailedMsg = opFailedMsg
 
     def read(self, iprot):
@@ -1841,12 +1212,6 @@ class readVertex_result(object):
                     iprot.skip(ftype)
             elif fid == 1:
                 if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
                     self.opFailedMsg = OperationHasFailed()
                     self.opFailedMsg.read(iprot)
                 else:
@@ -1865,12 +1230,8 @@ class readVertex_result(object):
             oprot.writeFieldBegin('success', TType.STRUCT, 0)
             self.success.write(oprot)
             oprot.writeFieldEnd()
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
         if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
+            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 1)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -1990,20 +1351,18 @@ class updateVertex_args(object):
 class updateVertex_result(object):
     """
     Attributes:
-     - wrongServer
      - opFailedMsg
      - invalidObjMsg
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
+        (1, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 1
+        None,  # 2
         (3, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 3
     )
 
-    def __init__(self, wrongServer=None, opFailedMsg=None, invalidObjMsg=None,):
-        self.wrongServer = wrongServer
+    def __init__(self, opFailedMsg=None, invalidObjMsg=None,):
         self.opFailedMsg = opFailedMsg
         self.invalidObjMsg = invalidObjMsg
 
@@ -2017,12 +1376,6 @@ class updateVertex_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
                 if ftype == TType.STRUCT:
                     self.opFailedMsg = OperationHasFailed()
                     self.opFailedMsg.read(iprot)
@@ -2044,12 +1397,8 @@ class updateVertex_result(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('updateVertex_result')
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
         if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
+            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 1)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
@@ -2137,21 +1486,15 @@ class deleteVertex_args(object):
 class deleteVertex_result(object):
     """
     Attributes:
-     - wrongServer
-     - opFailedMsg
      - invalidObjMsg
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-        (3, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 3
+        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
     )
 
-    def __init__(self, wrongServer=None, opFailedMsg=None, invalidObjMsg=None,):
-        self.wrongServer = wrongServer
-        self.opFailedMsg = opFailedMsg
+    def __init__(self, invalidObjMsg=None,):
         self.invalidObjMsg = invalidObjMsg
 
     def read(self, iprot):
@@ -2164,18 +1507,6 @@ class deleteVertex_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
                 if ftype == TType.STRUCT:
                     self.invalidObjMsg = InvalidObject()
                     self.invalidObjMsg.read(iprot)
@@ -2191,16 +1522,8 @@ class deleteVertex_result(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('deleteVertex_result')
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 3)
+            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
             self.invalidObjMsg.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2224,7 +1547,6 @@ class deleteVertex_result(object):
 class createEdge_args(object):
     """
     Attributes:
-     - edgeID
      - vertexA
      - vertexB
      - weight
@@ -2234,16 +1556,14 @@ class createEdge_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'edgeID', None, None, ),  # 1
-        (2, TType.I64, 'vertexA', None, None, ),  # 2
-        (3, TType.I64, 'vertexB', None, None, ),  # 3
-        (4, TType.I64, 'weight', None, None, ),  # 4
-        (5, TType.I32, 'flag', None, None, ),  # 5
-        (6, TType.I64, 'description', None, None, ),  # 6
+        (1, TType.I64, 'vertexA', None, None, ),  # 1
+        (2, TType.I64, 'vertexB', None, None, ),  # 2
+        (3, TType.I64, 'weight', None, None, ),  # 3
+        (4, TType.I32, 'flag', None, None, ),  # 4
+        (5, TType.STRING, 'description', 'UTF8', None, ),  # 5
     )
 
-    def __init__(self, edgeID=None, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
-        self.edgeID = edgeID
+    def __init__(self, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
         self.vertexA = vertexA
         self.vertexB = vertexB
         self.weight = weight
@@ -2261,32 +1581,27 @@ class createEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.edgeID = iprot.readI64()
+                    self.vertexA = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.I64:
-                    self.vertexA = iprot.readI64()
+                    self.vertexB = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.I64:
-                    self.vertexB = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 4:
-                if ftype == TType.I64:
                     self.weight = iprot.readI64()
                 else:
                     iprot.skip(ftype)
-            elif fid == 5:
+            elif fid == 4:
                 if ftype == TType.I32:
                     self.flag = iprot.readI32()
                 else:
                     iprot.skip(ftype)
-            elif fid == 6:
-                if ftype == TType.I64:
-                    self.description = iprot.readI64()
+            elif fid == 5:
+                if ftype == TType.STRING:
+                    self.description = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2299,29 +1614,25 @@ class createEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('createEdge_args')
-        if self.edgeID is not None:
-            oprot.writeFieldBegin('edgeID', TType.I64, 1)
-            oprot.writeI64(self.edgeID)
-            oprot.writeFieldEnd()
         if self.vertexA is not None:
-            oprot.writeFieldBegin('vertexA', TType.I64, 2)
+            oprot.writeFieldBegin('vertexA', TType.I64, 1)
             oprot.writeI64(self.vertexA)
             oprot.writeFieldEnd()
         if self.vertexB is not None:
-            oprot.writeFieldBegin('vertexB', TType.I64, 3)
+            oprot.writeFieldBegin('vertexB', TType.I64, 2)
             oprot.writeI64(self.vertexB)
             oprot.writeFieldEnd()
         if self.weight is not None:
-            oprot.writeFieldBegin('weight', TType.I64, 4)
+            oprot.writeFieldBegin('weight', TType.I64, 3)
             oprot.writeI64(self.weight)
             oprot.writeFieldEnd()
         if self.flag is not None:
-            oprot.writeFieldBegin('flag', TType.I32, 5)
+            oprot.writeFieldBegin('flag', TType.I32, 4)
             oprot.writeI32(self.flag)
             oprot.writeFieldEnd()
         if self.description is not None:
-            oprot.writeFieldBegin('description', TType.I64, 6)
-            oprot.writeI64(self.description)
+            oprot.writeFieldBegin('description', TType.STRING, 5)
+            oprot.writeString(self.description.encode('utf-8') if sys.version_info[0] == 2 else self.description)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2418,16 +1729,19 @@ class createEdge_result(object):
 class readEdge_args(object):
     """
     Attributes:
-     - vertexID
+     - vertexA
+     - vertexB
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'vertexID', None, None, ),  # 1
+        (1, TType.I64, 'vertexA', None, None, ),  # 1
+        (2, TType.I64, 'vertexB', None, None, ),  # 2
     )
 
-    def __init__(self, vertexID=None,):
-        self.vertexID = vertexID
+    def __init__(self, vertexA=None, vertexB=None,):
+        self.vertexA = vertexA
+        self.vertexB = vertexB
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -2440,7 +1754,12 @@ class readEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.vertexID = iprot.readI64()
+                    self.vertexA = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.I64:
+                    self.vertexB = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2453,9 +1772,13 @@ class readEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('readEdge_args')
-        if self.vertexID is not None:
-            oprot.writeFieldBegin('vertexID', TType.I64, 1)
-            oprot.writeI64(self.vertexID)
+        if self.vertexA is not None:
+            oprot.writeFieldBegin('vertexA', TType.I64, 1)
+            oprot.writeI64(self.vertexA)
+            oprot.writeFieldEnd()
+        if self.vertexB is not None:
+            oprot.writeFieldBegin('vertexB', TType.I64, 2)
+            oprot.writeI64(self.vertexB)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2479,19 +1802,16 @@ class readEdge_result(object):
     """
     Attributes:
      - success
-     - wrongServer
      - opFailedMsg
     """
 
     thrift_spec = (
         (0, TType.STRUCT, 'success', (Edge, Edge.thrift_spec), None, ),  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
+        (1, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 1
     )
 
-    def __init__(self, success=None, wrongServer=None, opFailedMsg=None,):
+    def __init__(self, success=None, opFailedMsg=None,):
         self.success = success
-        self.wrongServer = wrongServer
         self.opFailedMsg = opFailedMsg
 
     def read(self, iprot):
@@ -2511,12 +1831,6 @@ class readEdge_result(object):
                     iprot.skip(ftype)
             elif fid == 1:
                 if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
                     self.opFailedMsg = OperationHasFailed()
                     self.opFailedMsg.read(iprot)
                 else:
@@ -2535,12 +1849,8 @@ class readEdge_result(object):
             oprot.writeFieldBegin('success', TType.STRUCT, 0)
             self.success.write(oprot)
             oprot.writeFieldEnd()
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
         if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
+            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 1)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2564,7 +1874,6 @@ class readEdge_result(object):
 class updateEdge_args(object):
     """
     Attributes:
-     - edgeID
      - vertexA
      - vertexB
      - weight
@@ -2574,16 +1883,14 @@ class updateEdge_args(object):
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'edgeID', None, None, ),  # 1
-        (2, TType.I64, 'vertexA', None, None, ),  # 2
-        (3, TType.I64, 'vertexB', None, None, ),  # 3
-        (4, TType.DOUBLE, 'weight', None, None, ),  # 4
-        (5, TType.I32, 'flag', None, None, ),  # 5
-        (6, TType.I64, 'description', None, None, ),  # 6
+        (1, TType.I64, 'vertexA', None, None, ),  # 1
+        (2, TType.I64, 'vertexB', None, None, ),  # 2
+        (3, TType.DOUBLE, 'weight', None, None, ),  # 3
+        (4, TType.I32, 'flag', None, None, ),  # 4
+        (5, TType.STRING, 'description', 'UTF8', None, ),  # 5
     )
 
-    def __init__(self, edgeID=None, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
-        self.edgeID = edgeID
+    def __init__(self, vertexA=None, vertexB=None, weight=None, flag=None, description=None,):
         self.vertexA = vertexA
         self.vertexB = vertexB
         self.weight = weight
@@ -2601,32 +1908,27 @@ class updateEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.edgeID = iprot.readI64()
+                    self.vertexA = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.I64:
-                    self.vertexA = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.I64:
                     self.vertexB = iprot.readI64()
                 else:
                     iprot.skip(ftype)
-            elif fid == 4:
+            elif fid == 3:
                 if ftype == TType.DOUBLE:
                     self.weight = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
-            elif fid == 5:
+            elif fid == 4:
                 if ftype == TType.I32:
                     self.flag = iprot.readI32()
                 else:
                     iprot.skip(ftype)
-            elif fid == 6:
-                if ftype == TType.I64:
-                    self.description = iprot.readI64()
+            elif fid == 5:
+                if ftype == TType.STRING:
+                    self.description = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2639,29 +1941,25 @@ class updateEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('updateEdge_args')
-        if self.edgeID is not None:
-            oprot.writeFieldBegin('edgeID', TType.I64, 1)
-            oprot.writeI64(self.edgeID)
-            oprot.writeFieldEnd()
         if self.vertexA is not None:
-            oprot.writeFieldBegin('vertexA', TType.I64, 2)
+            oprot.writeFieldBegin('vertexA', TType.I64, 1)
             oprot.writeI64(self.vertexA)
             oprot.writeFieldEnd()
         if self.vertexB is not None:
-            oprot.writeFieldBegin('vertexB', TType.I64, 3)
+            oprot.writeFieldBegin('vertexB', TType.I64, 2)
             oprot.writeI64(self.vertexB)
             oprot.writeFieldEnd()
         if self.weight is not None:
-            oprot.writeFieldBegin('weight', TType.DOUBLE, 4)
+            oprot.writeFieldBegin('weight', TType.DOUBLE, 3)
             oprot.writeDouble(self.weight)
             oprot.writeFieldEnd()
         if self.flag is not None:
-            oprot.writeFieldBegin('flag', TType.I32, 5)
+            oprot.writeFieldBegin('flag', TType.I32, 4)
             oprot.writeI32(self.flag)
             oprot.writeFieldEnd()
         if self.description is not None:
-            oprot.writeFieldBegin('description', TType.I64, 6)
-            oprot.writeI64(self.description)
+            oprot.writeFieldBegin('description', TType.STRING, 5)
+            oprot.writeString(self.description.encode('utf-8') if sys.version_info[0] == 2 else self.description)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2684,20 +1982,17 @@ class updateEdge_args(object):
 class updateEdge_result(object):
     """
     Attributes:
-     - wrongServer
      - opFailedMsg
      - invalidObjMsg
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-        (3, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 3
+        (1, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 1
+        (2, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 2
     )
 
-    def __init__(self, wrongServer=None, opFailedMsg=None, invalidObjMsg=None,):
-        self.wrongServer = wrongServer
+    def __init__(self, opFailedMsg=None, invalidObjMsg=None,):
         self.opFailedMsg = opFailedMsg
         self.invalidObjMsg = invalidObjMsg
 
@@ -2712,17 +2007,11 @@ class updateEdge_result(object):
                 break
             if fid == 1:
                 if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
                     self.opFailedMsg = OperationHasFailed()
                     self.opFailedMsg.read(iprot)
                 else:
                     iprot.skip(ftype)
-            elif fid == 3:
+            elif fid == 2:
                 if ftype == TType.STRUCT:
                     self.invalidObjMsg = InvalidObject()
                     self.invalidObjMsg.read(iprot)
@@ -2738,16 +2027,12 @@ class updateEdge_result(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('updateEdge_result')
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
         if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
+            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 1)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 3)
+            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 2)
             self.invalidObjMsg.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -2771,16 +2056,19 @@ class updateEdge_result(object):
 class deleteEdge_args(object):
     """
     Attributes:
-     - edgeID
+     - vertexA
+     - vertexB
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'edgeID', None, None, ),  # 1
+        (1, TType.I64, 'vertexA', None, None, ),  # 1
+        (2, TType.I64, 'vertexB', None, None, ),  # 2
     )
 
-    def __init__(self, edgeID=None,):
-        self.edgeID = edgeID
+    def __init__(self, vertexA=None, vertexB=None,):
+        self.vertexA = vertexA
+        self.vertexB = vertexB
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -2793,7 +2081,12 @@ class deleteEdge_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.edgeID = iprot.readI64()
+                    self.vertexA = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.I64:
+                    self.vertexB = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -2806,9 +2099,13 @@ class deleteEdge_args(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('deleteEdge_args')
-        if self.edgeID is not None:
-            oprot.writeFieldBegin('edgeID', TType.I64, 1)
-            oprot.writeI64(self.edgeID)
+        if self.vertexA is not None:
+            oprot.writeFieldBegin('vertexA', TType.I64, 1)
+            oprot.writeI64(self.vertexA)
+            oprot.writeFieldEnd()
+        if self.vertexB is not None:
+            oprot.writeFieldBegin('vertexB', TType.I64, 2)
+            oprot.writeI64(self.vertexB)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -2831,20 +2128,17 @@ class deleteEdge_args(object):
 class deleteEdge_result(object):
     """
     Attributes:
-     - wrongServer
      - opFailedMsg
      - invalidObjMsg
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.STRUCT, 'wrongServer', (WrongServer, WrongServer.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-        (3, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 3
+        (1, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 1
+        (2, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 2
     )
 
-    def __init__(self, wrongServer=None, opFailedMsg=None, invalidObjMsg=None,):
-        self.wrongServer = wrongServer
+    def __init__(self, opFailedMsg=None, invalidObjMsg=None,):
         self.opFailedMsg = opFailedMsg
         self.invalidObjMsg = invalidObjMsg
 
@@ -2859,17 +2153,11 @@ class deleteEdge_result(object):
                 break
             if fid == 1:
                 if ftype == TType.STRUCT:
-                    self.wrongServer = WrongServer()
-                    self.wrongServer.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
                     self.opFailedMsg = OperationHasFailed()
                     self.opFailedMsg.read(iprot)
                 else:
                     iprot.skip(ftype)
-            elif fid == 3:
+            elif fid == 2:
                 if ftype == TType.STRUCT:
                     self.invalidObjMsg = InvalidObject()
                     self.invalidObjMsg.read(iprot)
@@ -2885,171 +2173,13 @@ class deleteEdge_result(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('deleteEdge_result')
-        if self.wrongServer is not None:
-            oprot.writeFieldBegin('wrongServer', TType.STRUCT, 1)
-            self.wrongServer.write(oprot)
-            oprot.writeFieldEnd()
         if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
+            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 1)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 3)
+            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 2)
             self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class listVertexes_args(object):
-    """
-    Attributes:
-     - edge
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.I64, 'edge', None, None, ),  # 1
-    )
-
-    def __init__(self, edge=None,):
-        self.edge = edge
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.I64:
-                    self.edge = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('listVertexes_args')
-        if self.edge is not None:
-            oprot.writeFieldBegin('edge', TType.I64, 1)
-            oprot.writeI64(self.edge)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class listVertexes_result(object):
-    """
-    Attributes:
-     - success
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        (0, TType.LIST, 'success', (TType.STRUCT, (Vertex, Vertex.thrift_spec), False), None, ),  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, success=None, invalidObjMsg=None, opFailedMsg=None,):
-        self.success = success
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.LIST:
-                    self.success = []
-                    (_etype24, _size21) = iprot.readListBegin()
-                    for _i25 in range(_size21):
-                        _elem26 = Vertex()
-                        _elem26.read(iprot)
-                        self.success.append(_elem26)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('listVertexes_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.LIST, 0)
-            oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter27 in self.success:
-                iter27.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -3160,11 +2290,11 @@ class listEdges_result(object):
             if fid == 0:
                 if ftype == TType.LIST:
                     self.success = []
-                    (_etype31, _size28) = iprot.readListBegin()
-                    for _i32 in range(_size28):
-                        _elem33 = Edge()
-                        _elem33.read(iprot)
-                        self.success.append(_elem33)
+                    (_etype17, _size14) = iprot.readListBegin()
+                    for _i18 in range(_size14):
+                        _elem19 = Edge()
+                        _elem19.read(iprot)
+                        self.success.append(_elem19)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -3193,8 +2323,8 @@ class listEdges_result(object):
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter34 in self.success:
-                iter34.write(oprot)
+            for iter20 in self.success:
+                iter20.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
@@ -3314,11 +2444,11 @@ class listNeighbourVertexes_result(object):
             if fid == 0:
                 if ftype == TType.LIST:
                     self.success = []
-                    (_etype38, _size35) = iprot.readListBegin()
-                    for _i39 in range(_size35):
-                        _elem40 = Vertex()
-                        _elem40.read(iprot)
-                        self.success.append(_elem40)
+                    (_etype24, _size21) = iprot.readListBegin()
+                    for _i25 in range(_size21):
+                        _elem26 = Vertex()
+                        _elem26.read(iprot)
+                        self.success.append(_elem26)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -3347,8 +2477,8 @@ class listNeighbourVertexes_result(object):
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter41 in self.success:
-                iter41.write(oprot)
+            for iter27 in self.success:
+                iter27.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.invalidObjMsg is not None:
@@ -3359,756 +2489,6 @@ class listNeighbourVertexes_result(object):
             oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
             self.opFailedMsg.write(oprot)
             oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createVertexFile_args(object):
-    """
-    Attributes:
-     - dataToSave
-     - serverId
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.LIST, 'dataToSave', (TType.STRUCT, (Vertex, Vertex.thrift_spec), False), None, ),  # 1
-        (2, TType.I64, 'serverId', None, None, ),  # 2
-    )
-
-    def __init__(self, dataToSave=None, serverId=None,):
-        self.dataToSave = dataToSave
-        self.serverId = serverId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.dataToSave = []
-                    (_etype45, _size42) = iprot.readListBegin()
-                    for _i46 in range(_size42):
-                        _elem47 = Vertex()
-                        _elem47.read(iprot)
-                        self.dataToSave.append(_elem47)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I64:
-                    self.serverId = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createVertexFile_args')
-        if self.dataToSave is not None:
-            oprot.writeFieldBegin('dataToSave', TType.LIST, 1)
-            oprot.writeListBegin(TType.STRUCT, len(self.dataToSave))
-            for iter48 in self.dataToSave:
-                iter48.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.serverId is not None:
-            oprot.writeFieldBegin('serverId', TType.I64, 2)
-            oprot.writeI64(self.serverId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createVertexFile_result(object):
-    """
-    Attributes:
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, invalidObjMsg=None, opFailedMsg=None,):
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createVertexFile_result')
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createEdgeFile_args(object):
-    """
-    Attributes:
-     - dataToSave
-     - serverId
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.LIST, 'dataToSave', (TType.STRUCT, (Edge, Edge.thrift_spec), False), None, ),  # 1
-        (2, TType.I64, 'serverId', None, None, ),  # 2
-    )
-
-    def __init__(self, dataToSave=None, serverId=None,):
-        self.dataToSave = dataToSave
-        self.serverId = serverId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.dataToSave = []
-                    (_etype52, _size49) = iprot.readListBegin()
-                    for _i53 in range(_size49):
-                        _elem54 = Edge()
-                        _elem54.read(iprot)
-                        self.dataToSave.append(_elem54)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I64:
-                    self.serverId = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createEdgeFile_args')
-        if self.dataToSave is not None:
-            oprot.writeFieldBegin('dataToSave', TType.LIST, 1)
-            oprot.writeListBegin(TType.STRUCT, len(self.dataToSave))
-            for iter55 in self.dataToSave:
-                iter55.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.serverId is not None:
-            oprot.writeFieldBegin('serverId', TType.I64, 2)
-            oprot.writeI64(self.serverId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class createEdgeFile_result(object):
-    """
-    Attributes:
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        None,  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, invalidObjMsg=None, opFailedMsg=None,):
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('createEdgeFile_result')
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class getLocalVertexes_args(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('getLocalVertexes_args')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class getLocalVertexes_result(object):
-    """
-    Attributes:
-     - success
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        (0, TType.LIST, 'success', (TType.STRUCT, (Vertex, Vertex.thrift_spec), False), None, ),  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, success=None, invalidObjMsg=None, opFailedMsg=None,):
-        self.success = success
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.LIST:
-                    self.success = []
-                    (_etype59, _size56) = iprot.readListBegin()
-                    for _i60 in range(_size56):
-                        _elem61 = Vertex()
-                        _elem61.read(iprot)
-                        self.success.append(_elem61)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('getLocalVertexes_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.LIST, 0)
-            oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter62 in self.success:
-                iter62.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class getLocalEdges_args(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('getLocalEdges_args')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class getLocalEdges_result(object):
-    """
-    Attributes:
-     - success
-     - invalidObjMsg
-     - opFailedMsg
-    """
-
-    thrift_spec = (
-        (0, TType.LIST, 'success', (TType.STRUCT, (Edge, Edge.thrift_spec), False), None, ),  # 0
-        (1, TType.STRUCT, 'invalidObjMsg', (InvalidObject, InvalidObject.thrift_spec), None, ),  # 1
-        (2, TType.STRUCT, 'opFailedMsg', (OperationHasFailed, OperationHasFailed.thrift_spec), None, ),  # 2
-    )
-
-    def __init__(self, success=None, invalidObjMsg=None, opFailedMsg=None,):
-        self.success = success
-        self.invalidObjMsg = invalidObjMsg
-        self.opFailedMsg = opFailedMsg
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.LIST:
-                    self.success = []
-                    (_etype66, _size63) = iprot.readListBegin()
-                    for _i67 in range(_size63):
-                        _elem68 = Edge()
-                        _elem68.read(iprot)
-                        self.success.append(_elem68)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.invalidObjMsg = InvalidObject()
-                    self.invalidObjMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.opFailedMsg = OperationHasFailed()
-                    self.opFailedMsg.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('getLocalEdges_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.LIST, 0)
-            oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter69 in self.success:
-                iter69.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.invalidObjMsg is not None:
-            oprot.writeFieldBegin('invalidObjMsg', TType.STRUCT, 1)
-            self.invalidObjMsg.write(oprot)
-            oprot.writeFieldEnd()
-        if self.opFailedMsg is not None:
-            oprot.writeFieldBegin('opFailedMsg', TType.STRUCT, 2)
-            self.opFailedMsg.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class parseDataFromAllServers_args(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('parseDataFromAllServers_args')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class parseDataFromAllServers_result(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('parseDataFromAllServers_result')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class saveGraphOnServers_args(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('saveGraphOnServers_args')
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class saveGraphOnServers_result(object):
-
-    thrift_spec = (
-    )
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, (self.__class__, self.thrift_spec))
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
-            return
-        oprot.writeStructBegin('saveGraphOnServers_result')
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 

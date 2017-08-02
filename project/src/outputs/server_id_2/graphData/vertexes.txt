@@ -1,3 +1,0 @@
-vertexID,color,description,weight
-1,10,Tst1,1.0
-7,5,vert5,3.5

@@ -6,3 +6,5 @@ project/tests/
 *.pyc
 
 project/\.idea/
+
+project/src/client-server/todo\.md

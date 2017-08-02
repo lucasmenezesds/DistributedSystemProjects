@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+
 class Balancer(object):
     """docstring for Balancer"""
     def __init__(self, number_of_servers=1, array_of_vertexes=[], array_of_edges=[]):
@@ -9,21 +10,6 @@ class Balancer(object):
         self.__data_location = {}
         self.__array_of_vertexes = array_of_vertexes
         self.__array_of_edges = array_of_edges
-
-    def return_array_of_vertexes(self):
-        return self.__array_of_vertexes
-
-    def return_array_of_edges(self):
-        return self.__array_of_edges
-
-    def return_vertexes_data_table(self):
-        return self.__vertexes_dataLocation_table
-
-    def return_edges_data_table(self):
-        return self.__edges_dataLocation_table
-
-    def return_data_location(self):
-        return self.__data_location
 
     def balance_graph(self):
         for vertex in self.__array_of_vertexes:
@@ -51,7 +37,7 @@ class Balancer(object):
 
     def get_list_of_servers(self):
         return list(range(1, self.__number_of_servers))
-    
+
     def get_vertex_location(self, vertex_id):
         selected_server_id = vertex_id % self.__number_of_servers
         selected_server_id += 1
