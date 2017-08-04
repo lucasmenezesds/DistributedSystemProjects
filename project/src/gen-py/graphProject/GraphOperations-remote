@@ -25,17 +25,22 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('')
     print('Functions:')
     print('  void ping()')
+    print('  void shutdown()')
     print('  void createVertex(i64 vertexID, i64 color, string description, double weight)')
     print('  Vertex readVertex(i64 vertexID)')
     print('  void updateVertex(i64 vertexID, i64 color, string description, double weight)')
     print('  void deleteVertex(i64 vertexID)')
+    print('  bool hasVertex(i64 vertexID)')
     print('  void createEdge(i64 vertexA, i64 vertexB, i64 weight, i32 flag, string description)')
     print('  Edge readEdge(i64 vertexA, i64 vertexB)')
     print('  void updateEdge(i64 vertexA, i64 vertexB, double weight, i32 flag, string description)')
     print('  void deleteEdge(i64 vertexA, i64 vertexB)')
+    print('  bool hasEdge(i64 vertexA, i64 vertexB)')
+    print('   listAllVertexes(bool justLocal)')
+    print('   listAllEdges(bool justLocal)')
     print('   listEdges(i64 vertex)')
     print('   listNeighbourVertexes(i64 vertex)')
-    print('  void calculateDijkstra(i64 vertexA, i64 vertexB)')
+    print('   calculateDijkstra(i64 vertexA, i64 vertexB)')
     print('')
     sys.exit(0)
 
@@ -121,6 +126,12 @@ if cmd == 'ping':
         sys.exit(1)
     pp.pprint(client.ping())
 
+elif cmd == 'shutdown':
+    if len(args) != 0:
+        print('shutdown requires 0 args')
+        sys.exit(1)
+    pp.pprint(client.shutdown())
+
 elif cmd == 'createVertex':
     if len(args) != 4:
         print('createVertex requires 4 args')
@@ -145,6 +156,12 @@ elif cmd == 'deleteVertex':
         sys.exit(1)
     pp.pprint(client.deleteVertex(eval(args[0]),))
 
+elif cmd == 'hasVertex':
+    if len(args) != 1:
+        print('hasVertex requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.hasVertex(eval(args[0]),))
+
 elif cmd == 'createEdge':
     if len(args) != 5:
         print('createEdge requires 5 args')
@@ -168,6 +185,24 @@ elif cmd == 'deleteEdge':
         print('deleteEdge requires 2 args')
         sys.exit(1)
     pp.pprint(client.deleteEdge(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'hasEdge':
+    if len(args) != 2:
+        print('hasEdge requires 2 args')
+        sys.exit(1)
+    pp.pprint(client.hasEdge(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'listAllVertexes':
+    if len(args) != 1:
+        print('listAllVertexes requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.listAllVertexes(eval(args[0]),))
+
+elif cmd == 'listAllEdges':
+    if len(args) != 1:
+        print('listAllEdges requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.listAllEdges(eval(args[0]),))
 
 elif cmd == 'listEdges':
     if len(args) != 1:

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import sys
-sys.path.append("../libs/")
-sys.path.append("../gen-py/")
+import sys; sys.path.append("./libs/"); sys.path.append("./gen-py/")
 from input_parser import get_input
 
 def open_thrift():
@@ -35,7 +33,7 @@ def close_thrift():
 
 open_thrift()
 
-vertexes, edges = get_input('../user_input/')
+vertexes, edges = get_input('./user_input/')
 
 for vertexID, color, description, weight in vertexes:
     print "Creating vertex:", vertexID, color, description, weight

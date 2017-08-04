@@ -18,12 +18,13 @@ from thrift.protocol import TBinaryProtocol
 
 class ServerConnector(object):
     """docstring for ServersClient"""
-    def __init__(self, port, server_address="localhost"):
+    def __init__(self, server_id, port, server_address="localhost"):
         self.__port = port
         self.__server_address = server_address
         self.__transport = None
         self.__protocol = None
         self.__client = None
+        self.server_id = server_id
 
     def get_port(self):
         return self.__port
@@ -32,13 +33,9 @@ class ServerConnector(object):
         return self.__server_address
 
     def setup_connection(self):
-        # Make socket
         self.__transport = TSocket.TSocket(self.get_server_address(), self.get_port())
-        # Buffering is critical. Raw sockets are very slow
         self.__transport = TTransport.TBufferedTransport(self.__transport)
-        # Wrap in a protocol
         self.__protocol = TBinaryProtocol.TBinaryProtocol(self.__transport)
-        # Create a client to use the protocol encoder
         self.__client = GraphOperations.Client(self.__protocol)
 
     # Connect!
@@ -57,30 +54,22 @@ class ServerConnector(object):
     def ping(self):
         print('ping()')
 
+    def __enter__(self):
+        try:
+            self.setup_connection()
+            self.connect_to_server(self.server_id)
+        except:
+            self.__port += 1
+            try:
+                self.setup_connection()
+                self.connect_to_server(self.server_id)
+            except:
+                self.__port += 1
+                self.setup_connection()
+                self.connect_to_server(self.server_id)
 
-    def save_graph_data_file(self, tuple_array, server_id=None):
-        self.setup_connection()
-        self.connect_to_server(server_id)
-        for tuple_element in tuple_array:
-            data_to_save, data_type = tuple_element
-            if data_type == "vertexes":
-                print "Creating dataGraphs, saving %s" %(data_type)
-                self.__client.createVertexFile(data_to_save, server_id)
-                print "Done!\n"
-            if data_type == "edges":
-                print "Creating dataGraphs, saving %s" %(data_type)
-                self.__client.createEdgeFile(data_to_save, server_id)
-                print "Done!\n"
-        self.close_connection(server_id)
+        return self.__client
 
-    def get_graph_data(self, server_id):
-        graph_data = {}
-        self.setup_connection()
-        self.connect_to_server(server_id)
-        local_vertexes = self.__client.getLocalVertexes()
-        local_edges = self.__client.getLocalEdges()
-        graph_data["vertexes"] = local_vertexes
-        graph_data["edges"] = local_edges
-        self.close_connection(server_id)
-        print "Got the data, returning it!\n"
-        return graph_data
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print "== CLOSING CONNECTION =="
+        self.close_connection(self.server_id)

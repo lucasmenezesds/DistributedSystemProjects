@@ -30,7 +30,7 @@ def close_thrift():
     print("Bye!\n")
 
 
-def filter_vertexes(vertexes, obj_type):
+def filter_vertexes(neighbours, obj_type):
     return [vertex for vertex in neighbours if vertex.color == obj_type]
 
 
@@ -54,6 +54,24 @@ def find_nonsense(p, q):
     '''
     pass
 
+def get_smallest_score(personA, personB):
+    pass
 
-open_thrift()
-close_thrift()
+# TODO
+
+# Register movies, casts and ppl that watched the movies
+# Everyone which whatched the movies have a score for the movie
+
+# Given a group os persons search  all movies watched by the group or by one specific person
+
+# Given 2 ppl, identify the smaller score
+
+def populate_data():
+    pass
+
+if __name__ == '__main__':
+    open_thrift()
+    populate_data()
+
+
+    close_thrift()

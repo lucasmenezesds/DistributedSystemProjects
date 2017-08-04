@@ -38,16 +38,13 @@ print('ping()')
 
 
 # Operation
-# client.createGraph()
 print("Creating Vertex!\n")
 client.createVertex(932, 5, "vert5", 3.5)
 client.deleteVertex(98)
 read_v = client.readVertex(5)
 print read_v
-client.saveGraphOnServers()
 
 # client.calculateDijkstra(1, 3)
-# client.parseDataFromAllServers()
 
 # print("Listing Neighbours Vertexes from vertex %s" % (vertex))
 # print(client.listNeighbourVertexes(vertex))

@@ -43,17 +43,23 @@ service GraphOperations {
 
   void ping()
 
+  void shutdown()
+
   void createVertex(1: i64 vertexID, 2:i64 color, 3: string description, 4: double weight) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
   Vertex readVertex(1: i64 vertexID) throws (1: OperationHasFailed opFailedMsg)
   void updateVertex(1: i64 vertexID, 2:i64 color, 3: string description, 4:double weight) throws (1: OperationHasFailed opFailedMsg, 3: InvalidObject invalidObjMsg)
   void deleteVertex(1: i64 vertexID) throws (1: InvalidObject invalidObjMsg)
+  bool hasVertex(1: i64 vertexID) throws (1: OperationHasFailed opFailedMsg)
 
   void createEdge(1:i64 vertexA, 2:i64 vertexB, 3:i64 weight, 4:i32 flag, 5:string description) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
   Edge readEdge(1:i64 vertexA, 2:i64 vertexB) throws (1: OperationHasFailed opFailedMsg)
   void updateEdge(1:i64 vertexA, 2:i64 vertexB, 3:double weight, 4:i32 flag, 5:string description) throws (1: OperationHasFailed opFailedMsg, 2: InvalidObject invalidObjMsg)
   void deleteEdge(1:i64 vertexA, 2:i64 vertexB) throws (1: OperationHasFailed opFailedMsg, 2: InvalidObject invalidObjMsg)
+  bool hasEdge(1:i64 vertexA, 2:i64 vertexB) throws (1: OperationHasFailed opFailedMsg)
 
-  #list<Vertex> listVertexes(1:i64 vertexA, 2:i64 vertexB) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+
+  list<Vertex> listAllVertexes(1:bool justLocal) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+  list<Edge> listAllEdges(1:bool justLocal) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
   list<Edge> listEdges(1: i64 vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
   list<Vertex> listNeighbourVertexes(1: i64 vertex) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
 
@@ -62,5 +68,9 @@ service GraphOperations {
   #list<Vertex> getLocalVertexes() throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
   #list<Edge> getLocalEdges() throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
 
-  void calculateDijkstra(1:i64 vertexA, 2:i64 vertexB) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+  list<Vertex> calculateDijkstra(1:i64 vertexA, 2:i64 vertexB) throws (1: InvalidObject invalidObjMsg, 2: OperationHasFailed opFailedMsg)
+
+  # Part 4 Implementation
+
+  
 }
