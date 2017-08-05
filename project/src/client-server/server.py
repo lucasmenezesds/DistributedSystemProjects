@@ -10,9 +10,9 @@ sys.path.append("../gen-py/")
 import time
 import signal
 
-from rw_lock import *
+# from rw_lock import *
 from server_connector import *
-from dijkstra import *
+# from dijkstra import *
 
 from graphProject import *
 from graphProject.ttypes import *
@@ -374,7 +374,6 @@ class Handler(object):
 
         r = self._dijkstra(edges, from_id, to_id)
 
-        # import IPython; IPython.core.debugger.Tracer()()
         return r
 
 
@@ -454,8 +453,8 @@ class Handler(object):
         pp(path)
         # printJUS
 
-        import IPython; IPython.core.debugger.Tracer()()
-        return r
+        print self.r
+        return [Vertex(1, 1,'Vertex 1', 1), Vertex(3, 3,'Vertex 3', 1)]
 
 
     def raft_ports(self):

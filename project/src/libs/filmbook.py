@@ -66,6 +66,10 @@ def get_smallest_score(personA, personB):
 
 # Given 2 ppl, identify the smaller score
 
+# FILMBOOK
+# https://docs.google.com/document/d/1_G_M_JPodPqcNKHcysVE_Losxc2XsJrvbjiQSeanj3g/edit
+
+
 def populate_data():
     pass
 
