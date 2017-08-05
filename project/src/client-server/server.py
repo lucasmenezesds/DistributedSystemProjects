@@ -17,7 +17,7 @@ from server_connector import *
 from graphProject import *
 from graphProject.ttypes import *
 
-from threading import Lock, Semaphore
+# from threading import Lock, Semaphore
 from thrift import Thrift
 from thrift.server import TServer, TNonblockingServer
 from thrift.transport import TSocket
@@ -106,17 +106,6 @@ class Handler(object):
                     client.shutdown()
 
 
-
-
-
-
-    # def acquire_object_for_use(self):
-    #     self.mutual_exclusion.acquire()
-
-    # def release_object_of_use(self):
-    #     self.mutual_exclusion.release()
-
-
     ##############
     # DATA GRAPH #
     ##############
@@ -159,8 +148,6 @@ class Handler(object):
                 vertexes[int(vertexID)] = vertex
                 self.loaded_vertexes[int(vertexID)] = vertex
                 # self.vertexes[int(vertexID)] = vertex
-
-
 
 
     def load_edges(self):
@@ -524,13 +511,11 @@ def main(server_id, raft_id):
     except KeyboardInterrupt:
         pass
 
-
     print("\n\nExiting")
 
 
 vertexes_path = "../outputs/vertexes"
 edges_path = "../outputs/edges"
-# def __init__(self, server_id, number_of_servers):
 
 # port = int(sys.argv[1])
 # print sys.argv

@@ -14,9 +14,6 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 
 
-vertex = 1
-vertex2 = 2
-
 # Make socket
 transport = TSocket.TSocket('localhost', 3031)
 # Buffering is critical. Raw sockets are very slow
@@ -35,8 +32,6 @@ print('ping()')
 
 
 # Operation
-
-
 def populate():
   client.createVertex(0,5,'zero',1.0)
   client.createVertex(1,10,'1 ro',1.1)
@@ -56,7 +51,6 @@ def dijkstra_populate():
   client.createVertex(5, 5,'Vertex 5', 1)
   client.createVertex(6, 6,'Vertex 6', 1)
 
-
   print "Creating Edges"
   client.createEdge(1, 2,  7, 0, 'Edge')
   client.createEdge(1, 3,  9, 0, 'Edge')
@@ -73,26 +67,9 @@ def dijkstra_populate():
 
 # populate()
 
-# dijkstra_populate()
+dijkstra_populate()
 
 client.calculateDijkstra(1, 5)
-
-# print("Creating Vertex!\n")
-# client.createVertex(932, 5, "vert5", 3.5)
-# client.deleteVertex(98)
-# read_v = client.readVertex(5)
-# print read_v
-
-# client.calculateDijkstra(1, 3)
-
-# print("Listing Neighbours Vertexes from vertex %s" % (vertex))
-# print(client.listNeighbourVertexes(vertex))
-# print("Creating Vertex!\n")
-# client.createVertex(98, 5, "vert5", 3.5)
-# # print("Just created the Vertex!\n")
-# print("Listing Vertex %s" % (vertex2))
-# print(client.listEdges(vertex2))
-# print("\n\n")
 
 
 # Close!
